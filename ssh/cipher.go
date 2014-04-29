@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"hash"
 	"io"
+
+	"code.google.com/p/go.crypto/backport11"
 )
 
 const (
@@ -238,7 +240,7 @@ func (s *streamPacketCipher) writePacket(seqNum uint32, w io.Writer, rand io.Rea
 }
 
 type gcmCipher struct {
-	aead   cipher.AEAD
+	aead   backport11.AEAD
 	prefix [4]byte
 	iv     []byte
 	buf    []byte
@@ -250,7 +252,7 @@ func newGCMCipher(iv, key, macKey []byte) (packetCipher, error) {
 		return nil, err
 	}
 
-	aead, err := cipher.NewGCM(c)
+	aead, err := backport11.NewGCM(c)
 	if err != nil {
 		return nil, err
 	}
