@@ -105,13 +105,13 @@ type pubKeyCache struct {
 }
 
 // get returns the result for a given user/algo/key tuple.
-func (c *pubKeyCache) get(candidate cachedPubKey) (result error, ok bool) {
+func (c *pubKeyCache) get(candidate cachedPubKey) (result cachedPubKey, ok bool) {
 	for _, k := range c.keys {
 		if k.Equal(&candidate) {
-			return k.result, true
+			return k, true
 		}
 	}
-	return errors.New("ssh: not in cache"), false
+	return candidate, false
 }
 
 // add adds the given tuple to the cache.
@@ -337,7 +337,7 @@ userAuthLoop:
 				user:       s.user,
 				pubKeyData: pubKeyData,
 			}
-			candidate.result, ok = cache.get(candidate)
+			candidate, ok = cache.get(candidate)
 			if !ok {
 				candidate.perms, candidate.result = config.PublicKeyCallback(s, pubKey)
 				if candidate.result == nil && candidate.perms != nil && candidate.perms.CriticalOptions != nil && candidate.perms.CriticalOptions[sourceAddressCriticalOption] != "" {
